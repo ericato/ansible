@@ -1,0 +1,26 @@
+---
+-
+  name: Trabalhando com template jinja2
+  hosts: web
+  remote_user: ansible
+  become: yes
+    vars:
+    http_port: 80
+    max_clients: 200
+  remote_user: root
+
+  tasks:
+  - name: Valida que o Apache esteja na última versão
+    yum: name=httpd state=latest
+
+  - name: Substituia o arquivo de configuração httd.conf
+    template: src=/template/httpd.j2 dest=/etc/http/httpd.conf
+    notify:
+    - restart apache
+
+  - name: ensure apache is running (and enable it at boot)
+    service: name=httpd state=started enabled=yes
+
+  handlers:
+    - name: restart apache
+      service: name=httpd state=restarted
